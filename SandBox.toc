@@ -1,0 +1,46 @@
+## Interface: 80100
+## Title: SandBox
+## Notes: WoW API
+## Author: Michael Peterson
+## Version: 0.71
+## X-Expansion: BfA
+## 9 November, 2018
+
+##---------------------------------------------
+## Required / prerequisite files
+##---------------------------------------------
+Locales\enUS.lua
+libs\ErrorMsgFrame.lua
+libs\Errors.lua
+libs\MsgFrame.lua
+libs\SandBox.lua
+libs\ContainerEventHandler.lua
+
+##---------------------------------------------
+## Container Class Files
+##---------------------------------------------
+OO\BaseClass.lua
+OO\SlotClass.lua
+OO\BagClass.lua
+
+##---------------------------------------------
+## Combat Log files
+##---------------------------------------------
+## libs\Talents.lua
+## libs\Player.lua
+## libs\CombatLogDisplay.lua
+## libs\CombatLog.lua
+## Profiles\ShadowPriest.lua
+## Profiles\AffWarlock.lua
+## Profiles\FrostMage.lua
+
+##---------------------------------------------
+## Unit Test Files
+##---------------------------------------------
+## UnitTests\BaseTests.lua
+## UnitTests\SlotTests.lua
+## UnitTests\BagTests.lua
+
+## libs\SlashCmds.lua
+
+
