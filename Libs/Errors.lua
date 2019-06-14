@@ -146,9 +146,9 @@ local function getFileAndLineNo( stackTrace )
 end
 
 -- This method prints the FileAndLine result to the default message frame
-function errors.where()
-    local stackTrace = debugstack(2)
-    DEFAULT_CHAT_FRAME:AddMessage( getFileAndLineNo( stackTrace ))
+function errors.where( msg )
+	local stackTrace = debugstack(2)
+	DEFAULT_CHAT_FRAME:AddMessage( getFileAndLineNo( stackTrace ))
 end
 
 --***************************** TESTS ***********************************
