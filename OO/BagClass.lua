@@ -85,7 +85,6 @@ local function validateBagNumber( bagSlot )
 	end
 	return result
 end
-
 --***************************************************************************************************
 --                                BAG CONSTRUCTOR
 --***************************************************************************************************
@@ -124,7 +123,6 @@ function Bag:_init( bagSlot )
     -- --      self.bagSlot = 1
     -- --      self.inventoryID = ContainerIDToInventoryID( self.bagSlot )  
     -- --      self.itemLink = GetInventoryItemLink("player",invID)
-
     if self.bagSlot ~= BACKPACK_SLOT_NUMBER then
 		self.inventoryId = ContainerIDToInventoryID( self.bagSlot )    -- BLIZZ
 		self.itemLink = GetInventoryItemLink("Player", self.inventoryId )   -- BLIZZ
@@ -150,20 +148,56 @@ function Bag:_init( bagSlot )
 	self.type = getBagType( typeBitField )
 		
 	self.slotTable = {}
-    --	Create the required number of Slot objects (self.totalSlots )
+	--	Create the required number of Slot objects (self.totalSlots )
     for slotId = 1, self.totalSlots do
       self.slotTable[slotId] = Slot( self.bagSlot, slotId )
     end
 end
-
-function Bag:getSlot( slotId )
-  return self.slotTable[slotId]
+--***********************************************************************************************
+--									EVENT HANDLERS
+--***********************************************************************************************
+function Bag:bagUpdate( bagSlot )
+	local result = STATUS_SUCCESSFUL
+	local msg = string.format("[BAG_UPDATE] - bag slot %d\n", bagSlot )
+	mf:postMsg( msg )
+	return result
 end
 
---							GET/SET METHODS
+local itemIsPickedUp = 1
+local eventCount = 1
+function Bag:itemLockChanged( bagSlot, slotId)
+	local result = STATUS_SUCCESSFUL
+
+	if itemIsPickedUp == 1 then
+		--print( "[176] "..itemIsPickedUp )
+		local msg = string.format("Item picked up by cursor.\n")
+		mf:postMsg(msg)
+		itemIsPickedUp = 2
+		--print( string.format("\n"))
+	elseif itemIsPickedUp == 2 then
+		--print( "[182] "..itemIsPickedUp )
+		local msg = string.format("Item released from cursor.\n")
+		itemIsPickedUp = 1
+		--print( "[185] "..itemIsPickedUp )
+		mf:postMsg(msg)
+	else
+		print("We should not be here.")
+	end
+	
+	local msg = string.format("[%d] ITEM_LOCK_CHANGED - bag slot %d, slot %d\n", eventCount, bagSlot, slotId )
+	mf:postMsg( msg )
+	eventCount = eventCount + 1
+
+	return result
+end
+
 function Bag:getResult()
 	return self.result
 end
+function Bag:getSlot( slotId )
+  return self.slotTable[slotId]
+end
+--							GET/SET METHODS
 function Bag:bagType()    -- returns string value associated with self.type
   return self.type
 end
@@ -182,123 +216,6 @@ end
 function Bag:getNumFreeSlots()
     return GetContainerNumFreeSlots( self.bagSlot )    -- BLIZZ
 end
-function Bag:getSlotId()
+function Bag:getBagSlot()
   return self.bagSlot
 end
-
----------------------------------------- SELL GRAY I---------------------------------------------------
-
--- COMMENT: see https://wowwiki.fandom.com/wiki/API_GetItemInfo() for additional information
--- function SellGreyItems()
--- 	TotalPrice = 0
--- 	for myBags = 0,4 do
--- 		for bagSlots = 1, GetContainerNumSlots(myBags) do
--- 			CurrentItemLink = GetContainerItemLink(myBags, bagSlots)
--- 				if CurrentItemLink then
--- 					_, _, itemRarity, _, _, _, _, _, _, _, itemSellPrice = GetItemInfo(CurrentItemLink)
--- 					_, itemCount = GetContainerItemInfo(myBags, bagSlots)
--- 					if itemRarity == 0 and itemSellPrice ~= 0 then
--- 						TotalPrice = TotalPrice + (itemSellPrice * itemCount)
--- 						print("Sold: ".. CurrentItemLink .. " for " .. GetCoinTextureString(itemSellPrice * itemCount))
--- 						UseContainerItem(myBags, bagSlots)
--- 					end
--- 				end
--- 		end
--- 	end
--- 	if TotalPrice ~= 0 then
--- 		print("Total Price for all items: " .. GetCoinTextureString(TotalPrice))
--- 	else
--- 		print("No items were sold.")
--- 	end
--- end
-
--- local BtnSellGrey = CreateFrame( "Button" , "SellGreyBtn" , MerchantFrame, "UIPanelButtonTemplate" )
--- BtnSellGrey:SetText("Sell Grey")
--- BtnSellGrey:SetWidth(90)
--- BtnSellGrey:SetHeight(21)
--- BtnSellGrey:SetPoint("TopRight", -180, -30 )
--- BtnSellGrey:RegisterForClicks("AnyUp")
--- BtnSellGrey:SetScript("Onclick", SellGreyItems)
-
----------------------------------------- SELL GRAY II---------------------------------------------------
--- SellAllInBag = CreateFrame('Frame')
--- SellAllInBag.itemsToSell = {}
--- SellAllInBag.pendingBags = {}
- 
--- function SellAllInBag:SetCurrentBag(bagID)
---     wipe(self.itemsToSell)
---     self.currentBagID = bagID
---     self.itemsSold = 0
- 
---     local toggleEvent = (bagID ~= nil) and self.RegisterEvent or self.UnregisterEvent
- 
---     toggleEvent(self, 'BAG_UPDATE')
---     toggleEvent(self, 'BAG_UPDATE_DELAYED')
--- end
- 
--- function SellAllInBag:AttemptSellItems(index)
---     for i=index or 1, #self.itemsToSell do
---         UseContainerItem(self.currentBagID, self.itemsToSell[i])
---     end
--- end
- 
--- function SellAllInBag:ProcessNextInQueue()
---     local bagInQueue = tremove(self.pendingBags, 1)
---     if bagInQueue then
---         self(bagInQueue)
---     end
--- end
- 
--- function SellAllInBag:OnEvent(event)
---     if ( event == 'BAG_UPDATE' ) then
---         self.itemsSold = self.itemsSold + 1
---     elseif ( event == 'BAG_UPDATE_DELAYED' ) then
---         if ( self.itemsSold == #self.itemsToSell ) then
---             self:SetCurrentBag(nil)
---             self:ProcessNextInQueue()
---         else
---             self:AttemptSellItems(self.itemsSold)
---         end
---     elseif ( event == 'MERCHANT_SHOW' ) then
---         self.merchantAvailable = true
---     elseif ( event == 'MERCHANT_CLOSED' ) then
---         self.merchantAvailable = false
---         self:SetCurrentBag(nil)
---         wipe(self.pendingBags)
---     end
--- end
- 
--- SellAllInBag:RegisterEvent('MERCHANT_SHOW')
--- SellAllInBag:RegisterEvent('MERCHANT_CLOSED')
--- SellAllInBag:SetScript('OnEvent', SellAllInBag.OnEvent)
- 
--- setmetatable(SellAllInBag, {
---     __index = getmetatable(SellAllInBag).__index;
---     __call = function(self, bagID)
---     --------------------------------------------------
---         if self.merchantAvailable then
---             if not self.currentBagID then
---                 self:SetCurrentBag(bagID)
- 
---                 local itemsToSell = self.itemsToSell
---                 for slot=1, GetContainerNumSlots(bagID) do
---                     local link = select(7, GetContainerItemInfo(bagID, slot))
---                     local sellPrice = (link and select(11, GetItemInfo(link))) or 0
- 
---                     if sellPrice > 0 then
---                         itemsToSell[#itemsToSell + 1] = slot
---                     end
---                 end
- 
---                 if #itemsToSell > 0 then
---                     self:AttemptSellItems()
---                 else
---                     self:SetCurrentBag(nil)
---                 end
---             else
---                 tinsert(self.pendingBags, bagID)
---             end
---         end
---     --------------------------------------------------
---     end;
--- })
