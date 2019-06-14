@@ -65,7 +65,7 @@ if result[1] ~= STATUS_SUCCESS then
 	E:postResult( result )
 end
 
-mf:postMsg(string.format("The %s in slot %d is a %s bag\n", b:bagName(), b:getSlotId(), b:bagType() ))
+mf:postMsg(string.format("TEST 5: The %s in slot %d is a %s bag\n", b:bagName(), b:getSlotId(), b:bagType() ))
 
 local endTestMsg = string.format("\n%s\n", "**** END BAG TESTS ****")
 mf:postMsg( endTestMsg )
