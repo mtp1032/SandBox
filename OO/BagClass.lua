@@ -10,13 +10,13 @@ bag = MTP.BagClass
 local L = MTP.L
 local E = errors
 --------------------------------------------------------------------------------------------------
---              - The bagSlotId is the location of the bag. For example, 0 represents the player's
+--              - The bagSlot is the location of the bag. For example, 0 represents the player's
 --                  backpack
---              - The bagSlotId is used to obtain the inventoryId. Player bags begin at inventoryId = 20
+--              - The bagSlot is used to obtain the inventoryId. Player bags begin at inventoryId = 20
 --              - NUM_BAG_SLOTS = 4, BAG_SLOT0 = the player's backpack
 --              - NUM_BANKBAGSLOTS = 7
---              - bagSlotId 0 is inventoryId = 20
---              - bagSlotId 3 is inventoryId = 24
+--              - bagSlot 0 is inventoryId = 20
+--              - bagSlot 3 is inventoryId = 24
 --------------------------------------------------------------------------------------------------
 local BACKPACK_SLOT_NUMBER = 0
 
@@ -69,16 +69,16 @@ local function getBagType( typeBitField )
   return bagType
 end
 
-local function validateBagNumber( bagSlotId )
+local function validateBagNumber( bagSlot )
     local result = SUCCESSFUL_RESULT
 
-	if bagSlotId == nil then 
+	if bagSlot == nil then 
 		result = errors:setErrorResult( L["ARG_NIL"], debugstack() )
-    elseif type(bagSlotId) ~= "number" then
+    elseif type(bagSlot) ~= "number" then
 		result = errors:setErrorResult( L["ARG_WRONGTYPE"],debugstack())
-	elseif bagSlotId < BACKPACK_SLOT_NUMBER then
+	elseif bagSlot < BACKPACK_SLOT_NUMBER then
 		result = errors:setErrorResult( L["ARG_OUTOFRANGE"], debugstack() )
-    elseif bagSlotId > 4 then
+    elseif bagSlot > 4 then
 		result = errors:setErrorResult( L["ARG_OUTOFRANGE"], debugstack() )
 	else
 		return result
@@ -100,19 +100,19 @@ setmetatable(Bag, {
     return self
   end,
 })
-function Bag:_init( bagSlotId )   
+function Bag:_init( bagSlot )   
         --          Inherited from the BaseClass parent
 	Base._init(self)
     local result = SUCCESSFUL_RESULT
     self.is_a = "Bag"
 	
 	-- check that the input is a valid bag.	
-	self.result = validateBagNumber( bagSlotId )
+	self.result = validateBagNumber( bagSlot )
 	if self.result[1] ~= STATUS_SUCCESS then
       return
     end
 
-	self.bagSlotId = bagSlotId
+	self.bagSlot = bagSlot
 	
 	--mf:postMsg( string.format("%s in empty bag slot\n", self.name ))
     
@@ -120,13 +120,13 @@ function Bag:_init( bagSlotId )
     -- --      https://wow.gamepedia.com/API_ContainerIDToInventoryID and
     -- --      https://wow.gamepedia.com/API_GetBagName
     -- -- 
-    -- --  Example USAGE:  Get the itemLink of the bag at bagSlotId 1
-    -- --      self.bagSlotId = 1
-    -- --      self.inventoryID = ContainerIDToInventoryID( self.bagSlotId )  
+    -- --  Example USAGE:  Get the itemLink of the bag at bagSlot 1
+    -- --      self.bagSlot = 1
+    -- --      self.inventoryID = ContainerIDToInventoryID( self.bagSlot )  
     -- --      self.itemLink = GetInventoryItemLink("player",invID)
 
-    if self.bagSlotId ~= BACKPACK_SLOT_NUMBER then
-		self.inventoryId = ContainerIDToInventoryID( self.bagSlotId )    -- BLIZZ
+    if self.bagSlot ~= BACKPACK_SLOT_NUMBER then
+		self.inventoryId = ContainerIDToInventoryID( self.bagSlot )    -- BLIZZ
 		self.itemLink = GetInventoryItemLink("Player", self.inventoryId )   -- BLIZZ
 		if self.itemLink == '' then
 	  		E:setErrorResult(L["BAG_SLOT_UNOCCUPIED"], debugstack() )
@@ -136,7 +136,7 @@ function Bag:_init( bagSlotId )
 		self.itemLink = nil
 	end
 
-	self.name = GetBagName( bagSlotId )   -- BLIZZ
+	self.name = GetBagName( bagSlot )   -- BLIZZ
 	if self.name == 0 then
 		self.name = nil
 	end
@@ -145,14 +145,14 @@ function Bag:_init( bagSlotId )
 	-- see https://wow.gamepedia.com/API_GetContainerNumFreeSlots
 
     -- check the occupancy (free and occupied slots ) and get the bag type
-	self.totalSlots = GetContainerNumSlots(self.bagSlotId )   -- BLIZZ
-    _, typeBitField = GetContainerNumFreeSlots( self.bagSlotId )    -- BLIZZ
+	self.totalSlots = GetContainerNumSlots(self.bagSlot )   -- BLIZZ
+    _, typeBitField = GetContainerNumFreeSlots( self.bagSlot )    -- BLIZZ
 	self.type = getBagType( typeBitField )
 		
 	self.slotTable = {}
     --	Create the required number of Slot objects (self.totalSlots )
     for slotId = 1, self.totalSlots do
-      self.slotTable[slotId] = Slot( self.bagSlotId, slotId )
+      self.slotTable[slotId] = Slot( self.bagSlot, slotId )
     end
 end
 
@@ -180,10 +180,10 @@ function Bag:getTotalSlots()
     return self.totalSlots
 end
 function Bag:getNumFreeSlots()
-    return GetContainerNumFreeSlots( self.bagSlotId )    -- BLIZZ
+    return GetContainerNumFreeSlots( self.bagSlot )    -- BLIZZ
 end
 function Bag:getSlotId()
-  return self.bagSlotId
+  return self.bagSlot
 end
 
 ---------------------------------------- SELL GRAY I---------------------------------------------------
