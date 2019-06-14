@@ -41,6 +41,13 @@ OO\BagClass.lua
 ## UnitTests\SlotTests.lua
 ## UnitTests\BagTests.lua
 
+##---------------------------------------------
+## Application files
+##---------------------------------------------
+Apps\SellItems.lua
+Apps\SlashCmds.lua
+
+
 ## libs\SlashCmds.lua
 
 
