@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------------
 -- SellItems.lua
+-- Sells all items in all bags according to their quaility - Grey, White, Green, etc.
 -- AUTHOR: Michael Peterson
--- Version 0.1
---	Sell all items in all bags according to their quaility - Grey, White, Green, etc.
+-- V 0.1 -- Sells only Grey and White items as specified in SlashCmds.lua
 -- ORIGINAL DATE: 14 June, 2019
 --------------------------------------------------------------------------------------
 local ADDON_C_NAME, MTP = ...
@@ -11,9 +11,8 @@ sell = MTP.SellItemss
 
 local L = MTP.L
 local E = errors
-
 --------------------------------------------------------------------------------------
---						QUALITY (RARITY ) values
+--						QUALITY (i.e., RARITY) values
 --						Presently defined in SlotClass.lua
 --------------------------------------------------------------------------------------
 -- QUALITY_GREY = 0
@@ -46,24 +45,37 @@ local function sellItems()
 			return 0
 		end
 
+		local itemsSold = 0
 		for i = 1, totalSlots do
 			local itemLink = GetContainerItemLink(bagSlot, i )	-- BLIZZ
 			if itemLink ~= nil then
 				if itemLink then
-					_, _, quality, _, _, _, _, _, _, _, itemSellPrice = GetItemInfo(itemLink)
+					itemInfo = {GetItemInfo(itemLink)}
+					quality = itemInfo[3]
+					itemSellPrice = itemInfo[11]
+					--_, _, quality, _, _, _, _, _, _, _, itemSellPrice = GetItemInfo(itemLink)
 					_, itemCount = GetContainerItemInfo( bagSlot, i )
 					if quality == itemQuality and itemSellPrice ~= 0 then
 						sumTotal = sumTotal + (itemSellPrice * itemCount)
-						mf:postMsg("Sold: ".. itemLink .. " for " .. GetCoinTextureString(itemSellPrice * itemCount))
 						UseContainerItem(bagSlot, i )
+						itemsSold = itemsSold + 1
+						-- mf:postMsg("Sold: ".. itemLink .. " for " .. GetCoinTextureString(itemSellPrice * itemCount))
 					end
 				end
 			end
-
+		end
+		local msg = string.format("No items were sold.\n")
+		if sumTotal == 0 then
+			DEFAULT_CHAT_FRAME:AddMessage(msg)
+		else
+			local word = "Items"
+			if itemsSold == 1 then 
+				word = "Item"
+			end
+			msg = string.format("%d %s sold for %s\n", itemsSold, word, GetCoinTextureString(sumTotal ))
+			DEFAULT_CHAT_FRAME:AddMessage( msg )
 		end
 	end
-
-	print( sumTotal )
 end
 
 local ButtonSellItems = CreateFrame( "Button" , "SellItemsBtn" , MerchantFrame, "UIPanelButtonTemplate" )
