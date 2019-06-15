@@ -169,23 +169,21 @@ function Bag:itemLockChanged( bagSlot, slotId)
 	local result = STATUS_SUCCESSFUL
 
 	if itemIsPickedUp == 1 then
-		--print( "[176] "..itemIsPickedUp )
 		local msg = string.format("Item picked up by cursor.\n")
-		mf:postMsg(msg)
+		--mf:postMsg(msg)
 		itemIsPickedUp = 2
-		--print( string.format("\n"))
 	elseif itemIsPickedUp == 2 then
-		--print( "[182] "..itemIsPickedUp )
 		local msg = string.format("Item released from cursor.\n")
 		itemIsPickedUp = 1
-		--print( "[185] "..itemIsPickedUp )
-		mf:postMsg(msg)
+		local slot = self.slotTable[slotId]
+		slot:getItemCount()
+		--mf:postMsg(msg)
 	else
 		print("We should not be here.")
 	end
 	
 	local msg = string.format("[%d] ITEM_LOCK_CHANGED - bag slot %d, slot %d\n", eventCount, bagSlot, slotId )
-	mf:postMsg( msg )
+	--mf:postMsg( msg )
 	eventCount = eventCount + 1
 
 	return result
