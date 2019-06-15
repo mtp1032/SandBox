@@ -48,6 +48,3 @@ Apps\SellItems.lua
 Apps\SlashCmds.lua
 
 
-## libs\SlashCmds.lua
-
-
