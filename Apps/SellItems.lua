@@ -1,16 +1,47 @@
 --------------------------------------------------------------------------------------
 -- SellItems.lua
 -- Sells all items in all bags according to their quaility - Grey, White, Green, etc.
+-- 		See SellJunk video - https://www.youtube.com/watch?v=dwg8SmxnA9Y
+-- For info on how to setup the options panel see the following addons:
+-- Azeroth Autopilot, Bagnon, Details, GatherMate 2, GTFO, HandyNotes, Mogit, Norganna 
+-- 		Slide Bar, SexyMap, and Titan Panel
+-- Azeroth Autopilot - loads an external options menu
+-- Bagnon - loads an external options menu
+-- Gathermate 2 - Interface closely models what I want SellItems to display
+-- Titan Panel - Not an options screen. Just an information display panel.
+-- GTFO - like Gathermate 2
 -- AUTHOR: Michael Peterson
 -- V 0.1 -- Sells only Grey and White items as specified in SlashCmds.lua
 -- ORIGINAL DATE: 14 June, 2019
 --------------------------------------------------------------------------------------
 local ADDON_C_NAME, MTP = ...
 MTP.SellItems = {}
-sell = MTP.SellItemss
+sellItems = MTP.SellItems
 
 local L = MTP.L
 local E = errors
+
+ChaChing = {};
+ChaChing.panel = CreateFrame( "Frame", "ChaChingPanel", UIParent );  -- Registers in the Interface Addon Options GUI
+ChaChing.panel.name = "ChaChing";  -- Sets the name for the parent Category in the Options Panel
+ InterfaceOptions_AddCategory(ChaChing.panel); -- Add the panel to the Interface Options
+ 
+ -- Make a child panel to specify what quality/rarity of items to sell (e.g, grey, white, etc.,)
+ ChaChing.childpanel = CreateFrame( "Frame", "ChaChingChild", ChaChing.panel);
+ ChaChing.childpanel.name = "Item Filters";
+ ChaChing.childpanel.parent = ChaChing.panel.name;
+ InterfaceOptions_AddCategory(ChaChing.childpanel);
+
+ -- Make a second child panel to specify what specific items the addon is NOT TO SELL
+ ChaChing.childpanel = CreateFrame( "Frame", "ChaChingChild", ChaChing.panel);
+ ChaChing.childpanel.name = "Item Black list";
+ ChaChing.childpanel.parent = ChaChing.panel.name;
+ InterfaceOptions_AddCategory(ChaChing.childpanel);
+
+ -- Create an info panel to be displayed when the parent ChChing panel is displayed.
+ -- Now, create the bodies of the two child panels
+
+
 --------------------------------------------------------------------------------------
 --						QUALITY (i.e., RARITY) values
 --						Presently defined in SlotClass.lua
@@ -29,6 +60,14 @@ local itemQuality = QUALITY_NOT_SPECIFIED
 
 function setItemQuality( quality )
 	itemQuality = quality
+end
+
+local IS_DEBUG_ENABLED = 0
+function enableDebug()
+	IS_DEBUG_ENABLED = 1
+end
+function disableDebug()
+	IS_DEBUG_ENABLED = 0
 end
 local function sellItems()
 	local result = SUCCESSFUL_RESULT
