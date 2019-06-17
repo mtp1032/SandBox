@@ -26,6 +26,15 @@ SlashCmdList["PLAYERLOCATION"] = function(msg)
 end
  ]]
 
+--  SLASH_ENABLE_DEBUG1 = "/dbg"
+--  SLASH_ENABLE_DEBUG2 = "/dbgenable"
+--  SLASH_ENABLE_DEBUG3 = "/enabledbg"
+--  SLASH_ENABLE_DEBUG4 = "/debug"
+--  SlashCmdList[ENABLE_DEBUG] = function(msg)
+-- 	enableDebug()
+--  end
+
+
 SLASH_SELLGREY1 = "/sellgrey"
 SlashCmdList["SELLGREY"] = function( msg )
 	setItemQuality( QUALITY_GREY )
