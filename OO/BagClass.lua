@@ -156,6 +156,7 @@ end
 --***********************************************************************************************
 --									EVENT HANDLERS
 --***********************************************************************************************
+-- BAG_UPDATE
 function Bag:bagUpdate( bagSlot )
 	local result = STATUS_SUCCESSFUL
 	local msg = string.format("[BAG_UPDATE] - bag slot %d\n", bagSlot )
@@ -163,6 +164,7 @@ function Bag:bagUpdate( bagSlot )
 	return result
 end
 
+-- ITEM_LOCK_CHANGED
 local itemIsPickedUp = 1
 local eventCount = 1
 function Bag:itemLockChanged( bagSlot, slotId)
@@ -188,7 +190,9 @@ function Bag:itemLockChanged( bagSlot, slotId)
 
 	return result
 end
-
+--***********************************************************************************************
+--									GET / SET METHODS
+--***********************************************************************************************
 function Bag:getResult()
 	return self.result
 end
