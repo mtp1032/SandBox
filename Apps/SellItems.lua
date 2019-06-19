@@ -3,13 +3,13 @@
 -- Sells all items in all bags according to their quaility - Grey, White, Green, etc.
 -- 		See SellJunk video - https://www.youtube.com/watch?v=dwg8SmxnA9Y
 -- For info on how to setup the options panel see the following addons:
--- Azeroth Autopilot, Bagnon, Details, GatherMate 2, GTFO, HandyNotes, Mogit, Norganna 
+-- Azeroth Autopilot, Bagnon, Details, GatherMate 2, CHACHING, HandyNotes, Mogit, Norganna 
 -- 		Slide Bar, SexyMap, and Titan Panel
 -- Azeroth Autopilot - loads an external options menu
 -- Bagnon - loads an external options menu
 -- Gathermate 2 - Interface closely models what I want SellItems to display
 -- Titan Panel - Not an options screen. Just an information display panel.
--- GTFO - like Gathermate 2
+-- CHACHING - like Gathermate 2
 -- AUTHOR: Michael Peterson
 -- V 0.1 -- Sells only Grey and White items as specified in SlashCmds.lua
 -- ORIGINAL DATE: 14 June, 2019
@@ -21,25 +21,109 @@ sellItems = MTP.SellItems
 local L = MTP.L
 local E = errors
 
-ChaChing = {};
-ChaChing.panel = CreateFrame( "Frame", "ChaChingPanel", UIParent );  -- Registers in the Interface Addon Options GUI
-ChaChing.panel.name = "ChaChing";  -- Sets the name for the parent Category in the Options Panel
- InterfaceOptions_AddCategory(ChaChing.panel); -- Add the panel to the Interface Options
- 
- -- Make a child panel to specify what quality/rarity of items to sell (e.g, grey, white, etc.,)
- ChaChing.childpanel = CreateFrame( "Frame", "ChaChingChild", ChaChing.panel);
- ChaChing.childpanel.name = "Item Filters";
- ChaChing.childpanel.parent = ChaChing.panel.name;
- InterfaceOptions_AddCategory(ChaChing.childpanel);
+local sellingEnabled = false
+local sellGrey = false
+local sellWhite = false
 
- -- Make a second child panel to specify what specific items the addon is NOT TO SELL
- ChaChing.childpanel = CreateFrame( "Frame", "ChaChingChild", ChaChing.panel);
- ChaChing.childpanel.name = "Item Black list";
- ChaChing.childpanel.parent = ChaChing.panel.name;
- InterfaceOptions_AddCategory(ChaChing.childpanel);
+local function enableChaChing()
+	sellingEnabled = true
+	print("Cha-Ching is Enabled = true")
+end
+local function disableChaChing()
+	sellingEnabled = false
+end
 
- -- Create an info panel to be displayed when the parent ChChing panel is displayed.
- -- Now, create the bodies of the two child panels
+
+local function sellAllGreyItems()
+	sellGrey = true
+end
+local function sellNoGreyItems()
+	sellGrey = false
+end
+local function sellAllWhiteItems()
+	sellWhite = true
+end
+local function sellNoWhiteItems()
+	sellWhite = false
+end
+
+local CHACHING = {
+	DefaultSettings = {
+		Active = true
+	};
+	Version = "0.01", -- Version number (text format)
+	VersionNumber = 44800, -- Numeric version number for checking out-of-date clients
+	DataCode = "4",
+	isEnabled = false,
+	sellAllGreyItems = false,
+	sellAllWhiteItems = false
+};
+
+local function CHACHING_SetDefaults()
+	CHACHING.Settings.Active = CHACHING.DefaultSettings.Active;
+	-- CHACHING_SaveSettings();
+end
+
+local function CHACHING_RenderOptions()
+	CHACHING.UIRendered = true;
+
+	local ConfigurationPanel = CreateFrame("FRAME","CHACHING_MainFrame");
+	ConfigurationPanel.name = "CHACHING";
+	InterfaceOptions_AddCategory(ConfigurationPanel);	-- Register the Configuration panel with LibUIDropDownMenu
+
+	-- Print a header at the top of the panel
+	local IntroMessageHeader = ConfigurationPanel:CreateFontString(nil, "ARTWORK","GameFontNormalLarge");
+	IntroMessageHeader:SetPoint("TOPLEFT", 10, -10);
+	IntroMessageHeader:SetText("Cha-Ching Version "..CHACHING.Version );
+
+	-- Create three check buttons, one to enable the addon, one to sell grey iterms, and one to sell white items
+	local EnabledButton = CreateFrame("CheckButton", "CHACHING_EnabledButton", ConfigurationPanel, "ChatConfigCheckButtonTemplate");
+	EnabledButton:SetPoint("TOPLEFT", 10, -40)
+	EnabledButton.tooltip = "Check box to enable Cha-Ching, uncheck box to disable all selling"
+	getglobal(EnabledButton:GetName().."Text"):SetText("Enable Cha-Ching?");
+	EnabledButton:SetScript("OnClick",
+		function()
+			local isChecked = EnabledButton:GetChecked()
+			if isChecked then
+				enableChaChing()
+			else
+				disableChaChing()
+			end
+		end )
+
+	local GreyQualityButton = CreateFrame("CheckButton", "CHACHING_GreyQualityButton", ConfigurationPanel, "ChatConfigCheckButtonTemplate");
+	GreyQualityButton:SetPoint("TOPLEFT", 10, -95)
+	GreyQualityButton.tooltip = "Check to sell all grey items in your inventory."
+	getglobal(GreyQualityButton:GetName().."Text"):SetText("Sell All Grey Items!");
+	GreyQualityButton:SetScript("OnClick",
+	function()
+		local isChecked = GreyQualityButton:GetChecked()
+		if isChecked then
+			sellAllGreyItems()
+		else
+			sellNoGreyItems()
+		end
+	end )
+
+	local WhiteQualityButton = CreateFrame("CheckButton", "CHACHING_WhiteQualityButton", ConfigurationPanel, "ChatConfigCheckButtonTemplate");
+	WhiteQualityButton:SetPoint("TOPLEFT", 200, -95)
+	WhiteQualityButton.tooltip = "Check to sell all white items in your inventory. But be careful! Many potions, flasks, reagents, food, etc., are white)"
+	getglobal(WhiteQualityButton:GetName().."Text"):SetText("Sell All White Items?");
+	WhiteQualityButton:SetScript("OnClick",
+	function()
+		local isChecked = WhiteQualityButton:GetChecked()
+		if isChecked then
+			print("White quality button was unchecked and is now checked.")
+			sellAllWhiteItems()
+		else
+			print("White quality button was checked and is now unchecked.")
+			sellNoWhiteItems()
+		end
+	end )
+
+end
+
+CHACHING_RenderOptions()
 
 
 --------------------------------------------------------------------------------------
