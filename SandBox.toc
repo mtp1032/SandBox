@@ -26,6 +26,8 @@ OO\BagClass.lua
 ##---------------------------------------------
 ## Combat Log files
 ##---------------------------------------------
+Libs\LibStub\LibStub.lua
+Libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
 ## libs\Talents.lua
 ## libs\Player.lua
 ## libs\CombatLogDisplay.lua
@@ -46,5 +48,6 @@ OO\BagClass.lua
 ##---------------------------------------------
 Apps\SellItems.lua
 Apps\SlashCmds.lua
+
 
 
