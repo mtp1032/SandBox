@@ -26,7 +26,7 @@ NO_VALUE    = 9  -- Boolean - True if the item has no gold value, false otherwis
 ITEM_ID     = 10 -- Number - The unique ID for the item in the specified bag slot.
 
 
-QUALITY_GREY = 0
+QUALITY_POOR = 0
 QUALITY_COMMON = 1
 QUALITY_UNCOMMON = 2
 QUALITY__RARE = 3
